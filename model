@@ -1,0 +1,56 @@
+
+import numpy as np
+import pandas as pd
+import pickle
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn import preprocessing
+
+df = pd.read_csv('collegePlace.csv')
+
+
+x = df.drop('PlacedOrNot',axis='columns')
+x = x.drop('Age',axis='columns')
+x = x.drop('Hostel',axis='columns')
+y = df['PlacedOrNot']
+le = preprocessing.LabelEncoder()
+x['Gender'] = le.fit_transform(x['Gender'])
+x['Stream'] = le.fit_transform(x['Stream'])
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.3, random_state = 100)
+
+knn = KNeighborsClassifier(n_neighbors=5)  # You can adjust n_neighbors as needed
+knn.fit(x_train, y_train)
+
+
+pickle.dump(knn, open('knn_model.pkl', 'wb'))
+knn_model = pickle.load(open('knn_model.pkl', 'rb'))
+
+print(knn_model.predict([[1, 1, 1, 0, 0]]))
+
+classify= RandomForestClassifier(n_estimators= 10, criterion="entropy")
+classify.fit(x_train, y_train)
+
+pickle.dump(classify, open('model.pkl','wb'))
+
+model = pickle.load(open('model.pkl','rb'))
+print(model.predict([[1,1,1,0,0]]))
+
+classify = DecisionTreeClassifier(criterion="entropy")
+classify.fit(x_train, y_train)
+
+pickle.dump(classify, open('decision_tree_model.pkl', 'wb'))
+
+model = pickle.load(open('decision_tree_model.pkl', 'rb'))
+print(model.predict([[1, 1, 1, 0, 0]]))
+
+logreg = LogisticRegression()
+logreg.fit(x_train, y_train)
+
+pickle.dump(logreg, open('logreg_model.pkl', 'wb'))
+model = pickle.load(open('logreg_model.pkl', 'rb'))
+
+print(model.predict([[1, 1, 1, 0, 0]]))
